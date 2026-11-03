@@ -7,16 +7,26 @@ website: https://clientanticheat.netlify.app
 description: Kicks players who join without the Client Anticheat client mod.
 
 commands:
-  forceaegisac:
+  forceclientanticheat:
     description: Manage the Force Client Anticheat plugin.
-    usage: /forceaegisac reload
-    aliases: [faac]
-    permission: forceaegisac.admin
+    usage: /forceclientanticheat reload
+    aliases: [fcac, forceaegisac, faac]
+    permission: forceclientanticheat.admin
 
 permissions:
-  forceaegisac.bypass:
-    description: Players with this permission are never kicked for missing the mod.
+  forceclientanticheat.bypass:
+    description: Exempts a player from the client handshake requirement.
     default: false
-  forceaegisac.admin:
-    description: Allows reloading the plugin config.
+  forceclientanticheat.admin:
+    description: Allows reloading the server plugin config.
     default: op
+  forceaegisac.bypass:
+    description: Legacy alias for forceclientanticheat.bypass.
+    default: false
+    children:
+      forceclientanticheat.bypass: true
+  forceaegisac.admin:
+    description: Legacy alias for forceclientanticheat.admin.
+    default: op
+    children:
+      forceclientanticheat.admin: true

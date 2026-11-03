@@ -36,7 +36,7 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
         getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, this);
         getServer().getPluginManager().registerEvents(this, this);
 
-        getLogger().info("Force Client Anticheat enabled — Client Anticheat mod is required to play.");
+        getLogger().info("Force Client Anticheat enabled: Client Anticheat mod is required to play.");
     }
 
     @Override
@@ -59,7 +59,7 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        if (player.hasPermission("forceaegisac.bypass")) {
+        if (player.hasPermission("forceclientanticheat.bypass")) {
             if (logChecks) {
                 getLogger().info(player.getName() + " bypassed the Client Anticheat check (permission).");
             }
@@ -71,7 +71,7 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
             pending.remove(id);
             if (player.isOnline()) {
                 if (logChecks) {
-                    getLogger().info(player.getName() + " kicked — no Client Anticheat handshake received.");
+                    getLogger().info(player.getName() + " kicked: no Client Anticheat handshake received.");
                 }
                 player.kick(kickMessage);
             }
@@ -95,14 +95,13 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
         }
         String version = HandshakeProtocol.readSupportedVersion(message);
         if (version == null) {
-            // Invalid or outdated messages must not cancel the join deadline.
             return;
         }
         BukkitTask task = pending.remove(player.getUniqueId());
         if (task != null) {
             task.cancel();
             if (logChecks) {
-                getLogger().info(player.getName() + " verified — Client Anticheat v" + version + ".");
+                getLogger().info(player.getName() + " verified: Client Anticheat v" + version + ".");
             }
         }
     }

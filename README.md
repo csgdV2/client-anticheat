@@ -114,7 +114,7 @@ separate static deployment over in [`relay/`](relay/README.md).
 
 ### Server compatibility
 
-Force Client Anticheat 1.2.0 requires Client Anticheat 2.2 or newer on every supported
+Force Client Anticheat 1.3.0 requires Client Anticheat 2.2 or newer on every supported
 Minecraft version. Replace both the server plugin and the client mod JARs together.
 The new `clientanticheat:handshake_v2` channel validates protocol revision 2 and
 a minimum client release of 2.2 before accepting a handshake; older and malformed

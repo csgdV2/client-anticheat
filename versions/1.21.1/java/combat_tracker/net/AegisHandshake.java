@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
  * This is a compatibility check, not proof that the client has not been modified.
  */
 public final class AegisHandshake {
-    /** Shared channel id — must match the server plugin's channel exactly. */
+    /** Shared channel id  :  must match the server plugin's channel exactly. */
     public static final ResourceLocation CHANNEL =
             ResourceLocation.fromNamespaceAndPath("clientanticheat", "handshake_v2");
 

@@ -26,12 +26,12 @@ Players who join without it get kicked.
 | `forceaegisac.bypass` | `false` | Never kicked for missing the mod. |
 | `forceaegisac.admin` | op | Allows `/forceaegisac reload`. |
 
-### Handshake compatibility (Client Anticheat 2.1)
+### Handshake compatibility (Client Anticheat 2.2)
 
-Force Client Anticheat 1.1.0 requires Client Anticheat 2.1 on every supported
+Force Client Anticheat 1.2.0 requires Client Anticheat 2.2 or newer on every supported
 Minecraft version. Replace both the server plugin and the client mod JARs together.
 The new `clientanticheat:handshake_v2` channel validates protocol revision 2 and
-the exact client release before accepting a handshake; older and malformed
+a minimum client release of 2.2 before accepting a handshake; older and malformed
 messages do not satisfy the join check. The existing bypass permission still applies.
 Existing server configurations keep their custom kick message.
 

@@ -19,21 +19,34 @@ public class HandshakeProtocolTest {
 
     @Test
     public void acceptsCurrentProtocolAndRelease() {
-        assertEquals("2.1", HandshakeProtocol.readSupportedVersion(handshake(2, "2.1")));
+        assertEquals("2.2", HandshakeProtocol.readSupportedVersion(handshake(2, "2.2")));
     }
 
     @Test
     public void rejectsOldAndUnsupportedReleases() {
         assertNull(HandshakeProtocol.readSupportedVersion(handshake(2, "2.0")));
-        assertNull(HandshakeProtocol.readSupportedVersion(handshake(2, "2.10")));
+        assertNull(HandshakeProtocol.readSupportedVersion(handshake(2, "2.1")));
         assertNull(HandshakeProtocol.readSupportedVersion(handshake(2, "unknown")));
     }
 
     @Test
+    public void acceptsNewerCompatibleReleases() {
+        for (String version : new String[]{"2.2.0", "2.2.1", "2.3", "2.10", "3.0", "2.3-beta.1", "2.2+build.7"}) {
+            assertEquals(version, HandshakeProtocol.readSupportedVersion(handshake(2, version)));
+        }
+    }
+
+    @Test
+    public void rejectsOutdatedPrereleasesAndInvalidVersionStrings() {
+        for (String version : new String[]{"2.1.99", "2.2-beta", "1.99", "02.2", "2.02", "2", "2.2 ", "2.2x", "2.2-", "999999999999999999999.0"}) {
+            assertNull(HandshakeProtocol.readSupportedVersion(handshake(2, version)));
+        }
+    }
+
+    @Test
     public void rejectsOldAndUnsupportedProtocols() {
-        assertNull(HandshakeProtocol.readSupportedVersion(handshake(1, "2.1")));
-        assertNull(HandshakeProtocol.readSupportedVersion(handshake(3, "2.1")));
-        // Legacy wire format was just a VarInt-prefixed version string.
+        assertNull(HandshakeProtocol.readSupportedVersion(handshake(1, "2.2")));
+        assertNull(HandshakeProtocol.readSupportedVersion(handshake(3, "2.2")));
         assertNull(HandshakeProtocol.readSupportedVersion(new byte[]{3, '2', '.', '0'}));
     }
 
@@ -53,12 +66,12 @@ public class HandshakeProtocolTest {
         assertNull(HandshakeProtocol.readSupportedVersion(new byte[]{2, (byte) 0xff,
                 (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x7f}));
         assertNull(HandshakeProtocol.readSupportedVersion(new byte[]{(byte) 0x82, 0,
-                3, '2', '.', '1'}));
+                3, '2', '.', '2'}));
     }
 
     @Test
     public void rejectsTrailingDataAndInvalidUtf8() {
-        assertNull(HandshakeProtocol.readSupportedVersion(new byte[]{2, 3, '2', '.', '1', 0}));
+        assertNull(HandshakeProtocol.readSupportedVersion(new byte[]{2, 3, '2', '.', '2', 0}));
         assertNull(HandshakeProtocol.readSupportedVersion(new byte[]{2, 3, '2', '.', (byte) 0xff}));
     }
 }

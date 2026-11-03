@@ -1,4 +1,5 @@
 import { getStore } from "@netlify/blobs";
+import { sanitizeExternalFindings } from "../lib/evidence.mjs";
 
 export const config = { path: "/api/report" };
 
@@ -43,6 +44,22 @@ const sourceEntry = (v) => {
   };
 };
 
+const externalEntry = (value) => {
+  if (!value || typeof value !== "object"
+      || !["BEHAVIORAL", "OBSERVED_INPUT"].includes(value.category)) return null;
+  return {
+    id: text(value.id, 48),
+    label: text(value.label, 100),
+    category: value.category,
+    count: count(value.count),
+    samples: count(value.samples),
+    score: Math.min(100, count(value.score)),
+    detail: text(value.detail, 800),
+    firstEpochMs: Number.isSafeInteger(value.firstEpochMs) && value.firstEpochMs > 0 ? value.firstEpochMs : 0,
+    lastEpochMs: Number.isSafeInteger(value.lastEpochMs) && value.lastEpochMs > 0 ? value.lastEpochMs : 0,
+  };
+};
+
 export default async (req) => {
   if (req.method !== "POST") return json({ error: "method not allowed" }, 405);
 
@@ -70,7 +87,7 @@ export default async (req) => {
     startUtc: text(body.startUtc, 40),
     endUtc: text(body.endUtc, 40),
     detected: Array.isArray(body.detected)
-      ? body.detected.slice(0, 8).map((d) => text(d, 40)).filter(Boolean)
+      ? body.detected.slice(0, 16).map((d) => text(d, 80)).filter(Boolean)
       : [],
     flags: {
       hotbar: count(f.hotbar),
@@ -81,6 +98,10 @@ export default async (req) => {
     sources: Array.isArray(body.sources)
       ? body.sources.slice(0, MAX_SOURCES).map(sourceEntry).filter(Boolean)
       : [],
+    externalFindings: Array.isArray(body.externalFindings)
+      ? body.externalFindings.slice(0, 12).map(externalEntry).filter(Boolean) : [],
+    externalCoverage: text(body.externalCoverage, 160),
+    behaviorScore: Math.min(100, count(body.behaviorScore)),
     updatedAt: new Date().toISOString(),
   };
 

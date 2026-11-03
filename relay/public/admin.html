@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Client Anticheat — Admin</title>
+    <title>Client Anticheat Admin</title>
     <meta name="robots" content="noindex, nofollow" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
@@ -41,10 +41,10 @@
             <input
               id="search"
               type="search"
-              placeholder="Search player…"
+              placeholder="Search player, server, or finding…"
               autocomplete="off"
               spellcheck="false"
-              aria-label="Search player"
+              aria-label="Search reports"
             />
           </div>
           <div class="session">
@@ -54,6 +54,14 @@
       </header>
 
       <main>
+        <section class="page-heading"><div><p class="eyebrow">Client Anticheat / Admin</p><h2>Report management</h2>
+          <p class="page-description">Review sessions, inspect evidence, and manage report history.</p></div><a class="btn btn--ghost" href="/">Public reports</a></section>
+        <div class="review-notice"><strong>Behavioral Evidence is not definitive proof of cheating.</strong>Review observations in context. A running tool does not identify the source of an input event.</div>
+        <div class="report-filters">
+          <span id="resultCount" class="result-count" role="status">Loading reports…</span>
+          <label>Evidence <select id="evidenceFilter"><option value="all">All evidence</option><option value="automated">Automated Input</option><option value="windows">Windows input</option><option value="behavioral">Behavioral Evidence</option></select></label>
+          <label>Sort <select id="sortOrder"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="player">Player name</option></select></label>
+        </div>
         <div class="toolbar" id="toolbar">
           <label class="select-all">
             <input type="checkbox" id="selectAll" />
@@ -68,7 +76,7 @@
           </button>
         </div>
         <p id="status" class="status">Loading…</p>
-        <section id="cards" class="grid" aria-live="polite"></section>
+        <section id="cards" class="grid grid--cards" aria-live="polite"></section>
       </main>
     </div>
 

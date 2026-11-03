@@ -1,0 +1,37 @@
+:root {
+  --bg: #0e0f13;
+  --bg-elev: #16181f;
+  --panel: #1d2029;
+  --line: #282c37;
+  --text: #e7e9ee;
+  --muted: #9aa0ad;
+  --accent: #ffb454;
+}
+body { background: var(--bg); }
+.report-evidence { margin-top: 30px; }
+.report-evidence h2 { margin-bottom: 12px; }
+.evidence-intro, .evidence-empty { color: var(--muted); font-size: 13px; line-height: 1.7; }
+.evidence-empty { padding: 18px 0; }
+.input-observations { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 12px; margin: 18px 0; }
+.input-observation { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-elev); }
+.input-observation__count { display: block; margin-bottom: 6px; color: #5cc8ff; font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.input-observation h3 { margin: 0; font-size: 13px; font-weight: 500; }
+.evidence-unit { color: var(--muted); font-size: 11px; }
+.behavior-disclaimer { margin: 12px 0 18px; padding: 12px 15px; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: #ffb45407; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.behavior-disclaimer strong { color: #f0ca96; font-weight: 600; }
+.behavior-findings { display: flex; flex-direction: column; gap: 12px; }
+.behavior-finding { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-elev); }
+.behavior-finding__head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
+.behavior-finding h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.evidence-samples { color: var(--accent); font-size: 11px; font-variant-numeric: tabular-nums; }
+.behavior-finding > p { margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.evidence-details { margin-top: 12px; color: var(--muted); font-size: 12px; }
+.evidence-details summary { padding: 4px 0; cursor: pointer; color: #b1bac8; }
+.evidence-details p { max-width: 85ch; margin: 10px 0; line-height: 1.8; overflow-wrap: anywhere; }
+.evidence-details summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .input-observations { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .input-observation, .behavior-finding { padding: 14px; }
+  .input-observation__count { font-size: 23px; }
+  .behavior-finding__head { align-items: flex-start; }
+}

@@ -1,6 +1,7 @@
 package combat_tracker;
 
 import combat_tracker.detection.ClickTimestamps;
+import combat_tracker.detection.ExternalDetection;
 import combat_tracker.detection.InputContext;
 import combat_tracker.detection.IntegrityMonitor;
 import combat_tracker.detection.LatencyEstimator;
@@ -30,6 +31,7 @@ public class CombatTrackerClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         AegisHandshake.register();
+        ExternalDetection.get().initialize();
 
         ClientTickEvents.END_CLIENT_TICK.register(this::onEndTick);
 
@@ -41,12 +43,16 @@ public class CombatTrackerClient implements ClientModInitializer {
             SessionRecorder.get().onDisconnect();
             AegisHandshake.reset();
         });
-        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> SessionRecorder.get().onClientStopping());
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            SessionRecorder.get().onClientStopping();
+            ExternalDetection.get().shutdown();
+        });
 
         LOGGER.info("Client Anticheat initialized (client-side, observational only)");
     }
 
     private void onEndTick(Minecraft client) {
+        ExternalDetection.get().tick(client);
         LocalPlayer player = client.player;
         if (player == null) {
             ClickTimestamps.clear();

@@ -1,6 +1,7 @@
 package combat_tracker.record;
 
 import combat_tracker.detection.FlagOrigin;
+import combat_tracker.detection.ExternalDetection;
 import combat_tracker.detection.IntegrityMonitor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -84,12 +85,14 @@ public class SessionRecorder {
         }
         recording = true;
         resetSessionState();
+        ExternalDetection.get().beginSession();
     }
 
     public void onDisconnect() {
         if (!recording) {
             return;
         }
+        ExternalDetection.get().endSession();
         finalizeSession(false);
         recording = false;
     }
@@ -98,6 +101,7 @@ public class SessionRecorder {
         if (!recording) {
             return;
         }
+        ExternalDetection.get().endSession();
         finalizeSession(true);
         recording = false;
     }
@@ -266,7 +270,7 @@ public class SessionRecorder {
             return;
         }
 
-        boolean flagged = (data.flagHotbar + data.flagUse + data.flagAttack + data.flagKeybind) > 0;
+        boolean flagged = (data.flagHotbar + data.flagUse + data.flagAttack + data.flagKeybind) > 0 || !data.externalFindings.isEmpty();
         if (flagged) {
             ReportUploader.report(data, server, html, canonical, blockingSend);
         }
@@ -330,6 +334,9 @@ public class SessionRecorder {
                 .map(container -> container.getMetadata().getVersion().getFriendlyString())
                 .orElse("unknown");
         d.mods = collectMods();
+        d.externalFindings = ExternalDetection.get().findings();
+        d.externalCoverage = ExternalDetection.get().coverage();
+        d.behaviorScore = ExternalDetection.get().currentBehaviorScore();
         d.player = firstNonNull(playerName, p != null ? p.getName().getString() : null, "unknown");
         d.playerUuid = firstNonNull(playerUuid, p != null ? p.getUUID().toString() : null, "unknown");
         d.startEpochMs = startEpochMs;

@@ -80,6 +80,7 @@ if (sourceVariant) {
 }
 
 dependencies {
+	testImplementation 'junit:junit:4.13.2'
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	if (!deobfuscatedMinecraft) {
 		mappings loom.officialMojangMappings()
@@ -90,6 +91,14 @@ dependencies {
 	add(modDep, "net.fabricmc:fabric-loader:${project.loader_version}")
 
 	add(modDep, "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
+}
+
+sourceSets.test {
+	compileClasspath += sourceSets.client.output + sourceSets.client.compileClasspath
+	runtimeClasspath += sourceSets.client.runtimeClasspath
+}
+tasks.named('compileTestJava') {
+	dependsOn tasks.named('clientClasses')
 }
 
 processResources {

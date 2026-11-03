@@ -3,7 +3,7 @@
 	"id": "combat_tracker",
 	"version": "${version}",
 	"name": "Client Anticheat",
-	"description": "Client side anticheat. Watches combat for synthetic input and reports flagged sessions.",
+	"description": "Client side anticheat. Watches combat for automated input and reports flagged sessions.",
 	"authors": [
 		"csgd"
 	],

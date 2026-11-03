@@ -3,6 +3,7 @@
 	"package": "combat_tracker.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
+		"ExternalRaycastMixin",
 		"MultiPlayerGameModeMixin",
 		"MinecraftMixin",
 		"MouseHandlerMixin",

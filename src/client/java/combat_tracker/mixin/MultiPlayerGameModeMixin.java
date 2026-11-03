@@ -1,6 +1,7 @@
 package combat_tracker.mixin;
 
 import combat_tracker.detection.IntegrityMonitor;
+import combat_tracker.detection.ExternalDetection;
 import combat_tracker.detection.OpponentTracker;
 import combat_tracker.record.SessionRecorder;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -17,6 +18,7 @@ public class MultiPlayerGameModeMixin {
 
     @Inject(method = "attack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
     private void clientAnticheat$onAttack(Player player, Entity target, CallbackInfo ci) {
+        ExternalDetection.get().attack(target);
         IntegrityMonitor.get().checkSlotNow();
         IntegrityMonitor.get().onAttack();
         if (target instanceof Player hit) {

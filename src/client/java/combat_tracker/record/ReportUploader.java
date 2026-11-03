@@ -1,5 +1,6 @@
 package combat_tracker.record;
 
+import combat_tracker.detection.ExternalFinding;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
@@ -69,6 +70,9 @@ public final class ReportUploader {
         e.startUtc = d.startUtc;
         e.endUtc = d.endUtc;
         e.detected = detectedList(d);
+        e.externalFindings = d.externalFindings;
+        e.externalCoverage = d.externalCoverage;
+        e.behaviorScore = d.behaviorScore;
         e.flags = new Flags(d.flagHotbar, d.flagUse, d.flagAttack, d.flagKeybind);
         e.sources = d.flagSources == null ? List.of() : d.flagSources;
         e.html = html;
@@ -78,10 +82,14 @@ public final class ReportUploader {
 
     private static List<String> detectedList(SessionData d) {
         List<String> out = new ArrayList<>();
-        if (d.flagAttack > 0) out.add("Synthetic Attack");
-        if (d.flagKeybind > 0) out.add("Synthetic Keybind Press");
-        if (d.flagHotbar > 0) out.add("Synthetic Hotbar Switch");
-        if (d.flagUse > 0) out.add("Synthetic Use Item");
+        if (d.flagAttack > 0) out.add("Automated Attack");
+        if (d.flagKeybind > 0) out.add("Automated Key Press");
+        if (d.flagHotbar > 0) out.add("Automated Hotbar Switch");
+        if (d.flagUse > 0) out.add("Automated Item Use");
+        if (d.externalFindings != null) {
+            if (d.externalFindings.stream().anyMatch(f -> "BEHAVIORAL".equals(f.category()))) out.add("Behavioral Evidence");
+            if (d.externalFindings.stream().anyMatch(f -> "OBSERVED_INPUT".equals(f.category()))) out.add("Windows Software Generated Input");
+        }
         return out;
     }
 
@@ -94,6 +102,9 @@ public final class ReportUploader {
         String startUtc;
         String endUtc;
         List<String> detected;
+        List<ExternalFinding> externalFindings;
+        String externalCoverage;
+        int behaviorScore;
         Flags flags;
         List<SessionData.SourceEntry> sources;
         String html;

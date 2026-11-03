@@ -51,7 +51,7 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
         gracePeriodTicks = seconds * 20L;
         logChecks = getConfig().getBoolean("log-checks", true);
         String raw = getConfig().getString("kick-message",
-                "&cThis server requires Client Anticheat 2.1. Update your client mod.");
+                "&cThis server requires Client Anticheat 2.2 or newer. Update your client mod.");
         kickMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(raw);
     }
 

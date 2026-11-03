@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Client Anticheat — Reports</title>
+    <title>Client Anticheat Reports</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -11,25 +11,39 @@
       <div class="brand">
         <span class="dot" aria-hidden="true"></span>
         <h1>Client Anticheat</h1>
-        <span class="tag">sessions</span>
+
       </div>
       <div class="controls">
         <div class="search">
           <input
             id="search"
             type="search"
-            placeholder="Search player…"
+            placeholder="Search player, server, or finding…"
             autocomplete="off"
             spellcheck="false"
-            aria-label="Search player"
+            aria-label="Search reports"
           />
         </div>
       </div>
     </header>
 
     <main>
+      <section class="page-heading">
+        <div>
+          <h2>Reports</h2>
+          <p class="page-description">Review recorded input and gameplay patterns with the context behind each finding.</p>
+        </div>
+      </section>
+      <div class="review-notice"><strong>Behavioral Evidence is not definitive proof of cheating.</strong>
+        All reports are client reported observations. Review measurements and legitimate mod or accessibility tool use before drawing conclusions.</div>
+      <div class="report-filters">
+        <span id="resultCount" class="result-count" role="status">Loading reports…</span>
+        <label>Evidence <select id="evidenceFilter"><option value="all">All evidence</option><option value="automated">Automated Input</option><option value="windows">Windows input</option><option value="behavioral">Behavioral Evidence</option></select></label>
+        <label>Sort <select id="sortOrder"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="player">Player name</option></select></label>
+        <label>View <select id="viewMode"><option value="cards" selected>Cards</option><option value="list">List</option></select></label>
+      </div>
       <p id="status" class="status">Loading…</p>
-      <section id="grid" class="grid" aria-live="polite"></section>
+      <section id="grid" class="grid grid--cards" aria-live="polite"></section>
       <div class="more" hidden>
         <button id="loadMore" class="btn" type="button">Load more</button>
       </div>

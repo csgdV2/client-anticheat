@@ -7,7 +7,7 @@ grace-period-seconds: 5
 
 # Message shown to players who are kicked for not running Client Anticheat.
 # Supports '&' colour codes and \n for new lines.
-kick-message: "&c&lClient Anticheat update required\n\n&7Install &fClient Anticheat 2.1&7 to join.\n&bhttps://clientanticheat.netlify.app"
+kick-message: "&c&lClient Anticheat update required\n\n&7Install &fClient Anticheat 2.2 or newer&7 to join.\n&bhttps://clientanticheat.netlify.app"
 
 # Log a line to the console whenever a player passes or fails the check.
 log-checks: true

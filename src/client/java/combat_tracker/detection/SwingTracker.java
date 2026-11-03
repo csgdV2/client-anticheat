@@ -29,6 +29,9 @@ public final class SwingTracker {
         if (self == null || client.level == null) {
             return;
         }
+        if (!(hitResult instanceof EntityHitResult hit && hit.getEntity() instanceof Player)) {
+            ExternalDetection.get().swingMiss();
+        }
 
         Vec3 eye = self.getEyePosition();
         Vec3 look = self.getViewVector(1.0F).normalize();

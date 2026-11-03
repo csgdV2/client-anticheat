@@ -1,9 +1,13 @@
 package combat_tracker.record;
 
+import combat_tracker.detection.ExternalFinding;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class SessionData {
+    public List<ExternalFinding> externalFindings = new ArrayList<>();
+    public String externalCoverage;
+    public int behaviorScore;
     public String mod;
     public String mcVersion;
     public List<ModEntry> mods = new ArrayList<>();

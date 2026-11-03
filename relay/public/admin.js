@@ -1,4 +1,5 @@
-import { card, avatar, localTime } from "/report-card.js";
+import { card, avatar, localTime } from "./report-card.js";
+import { filterReports } from "./report-data.js";
 
 const gate = document.getElementById("gate");
 const gateForm = document.getElementById("gateForm");
@@ -194,10 +195,10 @@ async function post(path, body) {
     if (res.ok) return (await res.json().catch(() => ({}))) || {};
     if (res.status === 401) {
       password.value = "";
-      showGate("Session expired — sign in again.");
+      showGate("Session expired  :  sign in again.");
       return null;
     }
-    toast("Could not delete — the server refused.", "bad");
+    toast("Could not delete  :  the server refused.", "bad");
     return null;
   } catch {
     toast("Could not reach the server.", "bad");
@@ -337,8 +338,10 @@ function updateBulkUI() {
 }
 
 function render() {
-  const q = search.value.trim().toLowerCase();
-  shown = q ? all.filter((r) => (r.player || "").toLowerCase().includes(q)) : all;
+  shown = filterReports(all, { query: search.value,
+    evidence: document.getElementById("evidenceFilter").value,
+    sort: document.getElementById("sortOrder").value });
+  document.getElementById("resultCount").textContent = `${shown.length} matching sessions`;
 
   const visible = new Set(shown.map((r) => r.id));
   for (const id of [...selected]) if (!visible.has(id)) selected.delete(id);
@@ -346,7 +349,7 @@ function render() {
   cardsEl.replaceChildren();
   if (!shown.length) {
     statusEl.textContent = all.length
-      ? "No players match that search."
+      ? "No sessions match these filters."
       : "No reports yet.";
     statusEl.style.display = "";
     updateBulkUI();
@@ -374,6 +377,8 @@ search.addEventListener("input", () => {
   clearTimeout(debounce);
   debounce = setTimeout(render, 120);
 });
+document.getElementById("evidenceFilter").addEventListener("change", render);
+document.getElementById("sortOrder").addEventListener("change", render);
 
 async function boot() {
   try {
@@ -384,7 +389,7 @@ async function boot() {
     }
     openPanel(data.reports);
   } catch {
-    showGate("Could not reach the server — try signing in.");
+    showGate("Could not reach the server  :  try signing in.");
   }
 }
 

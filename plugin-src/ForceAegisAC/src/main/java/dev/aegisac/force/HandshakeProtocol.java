@@ -4,17 +4,20 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
-/** Release compatibility gate; a client can still impersonate this public protocol. */
 final class HandshakeProtocol {
     static final String CHANNEL = "clientanticheat:handshake_v2";
     static final int PROTOCOL_VERSION = 2;
-    static final String REQUIRED_VERSION = "2.1";
+    static final String MINIMUM_VERSION = "2.2";
+    private static final Pattern RELEASE = Pattern.compile(
+            "(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:\\.(0|[1-9][0-9]*))?"
+                    + "(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?"
+                    + "(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?");
 
     private HandshakeProtocol() {
     }
 
-    /** Returns the supported release only for a complete, well-formed handshake. */
     static String readSupportedVersion(byte[] message) {
         if (message == null || message.length == 0 || message.length > 106) {
             return null;
@@ -32,10 +35,30 @@ final class HandshakeProtocol {
                     .onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT)
                     .decode(input).toString();
-            return REQUIRED_VERSION.equals(version) ? version : null;
+            return supportsVersion(version) ? version : null;
         } catch (IllegalArgumentException | java.nio.BufferUnderflowException
                  | CharacterCodingException invalid) {
             return null;
+        }
+    }
+
+    static boolean supportsVersion(String version) {
+        if (version == null || version.length() > 32) return false;
+        var match = RELEASE.matcher(version);
+        if (!match.matches()) return false;
+        try {
+            int major = Integer.parseInt(match.group(1));
+            int minor = Integer.parseInt(match.group(2));
+            int patch = match.group(3) == null ? 0 : Integer.parseInt(match.group(3));
+            int[] actual = {major, minor, patch};
+            String[] minimum = MINIMUM_VERSION.split("\\.");
+            for (int index = 0; index < actual.length; index++) {
+                int floor = index < minimum.length ? Integer.parseInt(minimum[index]) : 0;
+                if (actual[index] != floor) return actual[index] > floor;
+            }
+            return match.group(4) == null;
+        } catch (NumberFormatException invalid) {
+            return false;
         }
     }
 

@@ -1,10 +1,8 @@
 package combat_tracker;
 
 import combat_tracker.detection.ClickTimestamps;
-import combat_tracker.detection.ComboTracker;
 import combat_tracker.detection.InputContext;
 import combat_tracker.detection.IntegrityMonitor;
-import combat_tracker.detection.JumpResetTracker;
 import combat_tracker.detection.LatencyEstimator;
 import combat_tracker.net.AegisHandshake;
 import combat_tracker.record.SessionRecorder;
@@ -22,19 +20,7 @@ public class CombatTrackerClient implements ClientModInitializer {
     public static final String MOD_ID = "combat_tracker";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static volatile long jumpNano = 0L;
-
-    public static volatile long hitNano = 0L;
-
     public static volatile long clickNano = 0L;
-
-    public static long consumeJumpNano() {
-        long v = jumpNano;
-        jumpNano = 0L;
-        return v;
-    }
-
-    private final JumpResetTracker tracker = new JumpResetTracker();
 
     private static final String MOD_VERSION = FabricLoader.getInstance()
             .getModContainer(MOD_ID)
@@ -57,7 +43,7 @@ public class CombatTrackerClient implements ClientModInitializer {
         });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> SessionRecorder.get().onClientStopping());
 
-        LOGGER.info("AegisAC initialized (client-side, observational only)");
+        LOGGER.info("Client Anticheat initialized (client-side, observational only)");
     }
 
     private void onEndTick(Minecraft client) {
@@ -67,8 +53,6 @@ public class CombatTrackerClient implements ClientModInitializer {
         }
         if (player != null && client.level != null) {
             AegisHandshake.tick(MOD_VERSION);
-            tracker.tick(client);
-            ComboTracker.get().tick(player);
             IntegrityMonitor.get().tick(player);
             SessionRecorder.get().samplePing(LatencyEstimator.get().currentMs());
             SessionRecorder.get().noteIdentity(player.getName().getString(), player.getUUID().toString());

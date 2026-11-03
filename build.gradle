@@ -13,7 +13,7 @@ version = project.mod_version
 group = project.maven_group
 
 base {
-	archivesName = 'aegisac'
+	archivesName = 'client-anticheat'
 }
 
 tasks.withType(AbstractArchiveTask).configureEach {

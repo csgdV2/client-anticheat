@@ -1,13 +1,14 @@
-name: ForceAegisAC
+name: ForceClientAnticheat
 version: ${project.version}
 main: dev.aegisac.force.ForceAegisAC
 api-version: '1.21'
-author: AegisAC
-description: Kicks players who join without the AegisAC client mod.
+author: csgd
+website: https://clientanticheat.netlify.app
+description: Kicks players who join without the Client Anticheat client mod.
 
 commands:
   forceaegisac:
-    description: Manage the ForceAegisAC plugin.
+    description: Manage the Force Client Anticheat plugin.
     usage: /forceaegisac reload
     aliases: [faac]
     permission: forceaegisac.admin

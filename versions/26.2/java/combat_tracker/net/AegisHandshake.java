@@ -8,21 +8,15 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
 /**
- * Lets a server prove the client is running AegisAC. 26.2 variant: the Fabric networking
- * API (v6) renamed the registry accessor {@code playC2S()} to {@code serverboundPlay()};
- * this overlay exists solely to use the new name. Behaviour is identical to the main-tree
- * copy.
- *
- * <p>The mod registers a client→server custom-payload channel ({@code aegisac:handshake})
- * and, once connected, sends a single message carrying the mod version. A server-side
- * plugin (see {@code plugin-src/ForceAegisAC}) that registers the same channel receives
- * that message and knows the player has the mod. This is the only network traffic the mod
- * sends to the game server; the actual reports still go to the dashboard, not the server.
+ * Announces the current Client Anticheat protocol and release to the server plugin.
+ * This is a compatibility check, not proof that the client has not been modified.
  */
 public final class AegisHandshake {
     /** Shared channel id — must match the server plugin's channel exactly. */
     public static final Identifier CHANNEL =
-            Identifier.fromNamespaceAndPath("aegisac", "handshake");
+            Identifier.fromNamespaceAndPath("clientanticheat", "handshake_v2");
+
+    public static final int PROTOCOL_VERSION = 2;
 
     private static volatile boolean pending = false;
     private static volatile boolean sent = false;
@@ -30,12 +24,15 @@ public final class AegisHandshake {
     private AegisHandshake() {
     }
 
-    /** The payload: just the mod version so the server can log/verify it. */
-    public record Payload(String version) implements CustomPacketPayload {
+    /** Protocol revision followed by the mod release. */
+    public record Payload(int protocol, String version) implements CustomPacketPayload {
         public static final Type<Payload> TYPE = new Type<>(CHANNEL);
         public static final StreamCodec<FriendlyByteBuf, Payload> CODEC = StreamCodec.of(
-                (buf, p) -> buf.writeUtf(p.version()),
-                buf -> new Payload(buf.readUtf()));
+                (buf, p) -> {
+                    buf.writeVarInt(p.protocol());
+                    buf.writeUtf(p.version(), 32);
+                },
+                buf -> new Payload(buf.readVarInt(), buf.readUtf(32)));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
@@ -70,7 +67,7 @@ public final class AegisHandshake {
             return;
         }
         if (ClientPlayNetworking.canSend(Payload.TYPE)) {
-            ClientPlayNetworking.send(new Payload(version));
+            ClientPlayNetworking.send(new Payload(PROTOCOL_VERSION, version));
             sent = true;
             pending = false;
         }

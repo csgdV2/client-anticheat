@@ -1,40 +1,39 @@
-# AegisAC
+# Client Anticheat
 
-AegisAC is a client-side Minecraft anticheat that watches your combat for
+Client Anticheat is a client-side Minecraft anticheat that watches your combat for
 **synthetic input** like clicks, hotbar switches, item use and keybind presses that came
 from a hacked client or a mod instead of your hands.
 
 ## What it looks for
 
-Whenever something suspicious happens, AegisAC traces where it came from a loaded mod or an unattributable direct write and notes it:
+Whenever something suspicious happens, Client Anticheat traces where it came from a loaded mod or an unattributable direct write and notes it:
 
 - **Synthetic attacks** — swings triggered by code rather than a real click.
 - **Synthetic use-item** — right-click actions fired by code.
 - **Synthetic hotbar switches** — slot changes with no real input behind them.
 - **Synthetic keybind presses** — bound actions fired programmatically.
 
-Around those flags it also keeps the combat context — jump-reset timing, combo
-intervals, reach, aim placement, swings, shield breaks.
+Around those flags it also keeps the combat context — reach, aim placement, swings, shield breaks.
 
 ## How reporting works
 
-AegisAC starts recording the moment you join a server. When the session ends, it sends a
+Client Anticheat starts recording the moment you join a server. When the session ends, it sends a
 report **only if it caught synthetic input during that session**.
 Reports show up on the dashboard:
 
-[You can access it by clicking here.](https://aegisac.netlify.app/)
+[You can access it by clicking here.](https://clientanticheat.netlify.app/)
 
 Keep in mind a flag isn't proof on its own. Plenty of allowed mods (Librarian trade
 finders, Snappy Tappy, better/advanced block placement and the like) fire programmatic
 input that trips the same detectors, which is why every flag on the dashboard says which
 mod or tool it came from so a reviewer can make the call in context.
 
-AegisAC never touches movement, aim, reach, or combat mechanics. It only watches.
+Client Anticheat never touches movement, aim, reach, or combat mechanics. It only watches.
 
 ## Requiring it on your server
 
-If you run a Paper server and want to *force* everyone to have AegisAC, there's a
-companion plugin: **ForceAegisAC**, [you can download it here](https://modrinth.com/plugin/force-aegisac).
+If you run a Paper server and want to *force* everyone to have Client Anticheat, there's a
+companion plugin: **Force Client Anticheat**, [you can download it here](https://modrinth.com/plugin/force-aegisac).
 Drop it in your `plugins/` folder and anyone who joins without the mod gets kicked.
 
 ## Install
@@ -46,7 +45,7 @@ You'll want **Java 21 or newer** and **Fabric Loader 0.17.0 or newer**
 
 Drop both of these into `.minecraft/mods/`:
 
-- **AegisAC** — `aegisac-<minecraft version>.jar`
+- **Client Anticheat** — `client-anticheat-<minecraft version>.jar`
 - [**Fabric API**](https://modrinth.com/mod/fabric-api) — required
 
 ## Building from source
@@ -60,7 +59,7 @@ Clone (or download) the repo, then from the project root:
 ```
 
 On Windows that's `gradlew.bat build`. The jar lands in `build/libs/` as
-`aegisac-<minecraft version>.jar`, built for 1.21.11 unless you ask for another version.
+`client-anticheat-<minecraft version>.jar`, built for 1.21.11 unless you ask for another version.
 
 Want to try it without installing anything? Launch Minecraft with the mod already
 loaded:
@@ -79,11 +78,19 @@ separate variants:
   -Ploader_version=... -Pfabric_api_version=...
 ```
 
-| Target | How |
-| --- | --- |
-| 1.21.11 | default — just `./gradlew build` |
-| 1.21.8, 1.21.4, 1.21.1 | `-PsourceVariant=<version>` |
-| 26.2 | `-PsourceVariant=26.2` — compiles for Java 25 |
+| Target | Source variant | Fabric API |
+| --- | --- | --- |
+| 1.21.1 | `1.21.1` | `0.116.17+1.21.1` |
+| 1.21.4 | `1.21.4` | `0.119.4+1.21.4` |
+| 1.21.8 | `1.21.8` | `0.136.1+1.21.8` |
+| 1.21.11 | default (omit `-PsourceVariant`) | `0.141.4+1.21.11` |
+| 26.2 | `26.2` (Java 25) | `0.161.0+26.2` |
+
+Pass `-Pminecraft_version=<target>` and `-Pfabric_api_version=<value>` alongside
+the source variant. On PowerShell, quote each complete `-P...` argument.
+The GitHub Actions build checks all five targets and uploads a separate artifact
+for each. All targets share the Client Anticheat name, website link, mod-author
+display, and reports without Jump Reset or Combo Timing.
 
 One caveat: on the pre-1.21.5 variants (1.21.1, 1.21.4) the hotbar-slot drift check is
 turned off, because the game API it leans on doesn't exist yet. Synthetic attack, use and
@@ -92,8 +99,25 @@ Fabric API versions on [fabricmc.net/develop](https://fabricmc.net/develop).
 
 ### Pointing it at your own site
 
+The default website is `https://clientanticheat.netlify.app`. Set the Netlify site
+name to `clientanticheat` and deploy `relay/` to serve the dashboard there.
+
+Mod authors and the updated report layout appear in new reports generated by the
+rebuilt mod. Previously saved reports keep their original embedded HTML.
+
 The upload URL lives in the `ENDPOINT` constant in
 [`ReportUploader.java`](src/client/java/combat_tracker/record/ReportUploader.java) — it's
 not a config option. Change it and rebuild to send reports to your own deployment, or
 leave `YOUR-SITE` in it to turn uploading off entirely. The dashboard itself is a
 separate static deployment over in [`relay/`](relay/README.md).
+
+### Handshake compatibility (Client Anticheat 2.1)
+
+Force Client Anticheat 1.1.0 requires Client Anticheat 2.1 on every supported
+Minecraft version. Replace both the server plugin and the client mod JARs together.
+The new `clientanticheat:handshake_v2` channel validates protocol revision 2 and
+the exact client release before accepting a handshake; older and malformed
+messages do not satisfy the join check. The existing bypass permission still applies.
+Existing server configurations keep their custom kick message.
+
+This checks release compatibility; it does not authenticate an unmodified client.

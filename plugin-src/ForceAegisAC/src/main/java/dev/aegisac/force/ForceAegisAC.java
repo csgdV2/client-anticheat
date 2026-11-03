@@ -14,14 +14,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMessageListener {
 
-    public static final String CHANNEL = "aegisac:handshake";
+    public static final String CHANNEL = HandshakeProtocol.CHANNEL;
 
     private final Map<UUID, BukkitTask> pending = new ConcurrentHashMap<>();
 
@@ -37,7 +36,7 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
         getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, this);
         getServer().getPluginManager().registerEvents(this, this);
 
-        getLogger().info("ForceAegisAC enabled — AegisAC mod is required to play.");
+        getLogger().info("Force Client Anticheat enabled — Client Anticheat mod is required to play.");
     }
 
     @Override
@@ -52,7 +51,7 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
         gracePeriodTicks = seconds * 20L;
         logChecks = getConfig().getBoolean("log-checks", true);
         String raw = getConfig().getString("kick-message",
-                "&cThis server requires the AegisAC client mod.");
+                "&cThis server requires Client Anticheat 2.1. Update your client mod.");
         kickMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(raw);
     }
 
@@ -62,7 +61,7 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
 
         if (player.hasPermission("forceaegisac.bypass")) {
             if (logChecks) {
-                getLogger().info(player.getName() + " bypassed the AegisAC check (permission).");
+                getLogger().info(player.getName() + " bypassed the Client Anticheat check (permission).");
             }
             return;
         }
@@ -72,7 +71,7 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
             pending.remove(id);
             if (player.isOnline()) {
                 if (logChecks) {
-                    getLogger().info(player.getName() + " kicked — no AegisAC handshake received.");
+                    getLogger().info(player.getName() + " kicked — no Client Anticheat handshake received.");
                 }
                 player.kick(kickMessage);
             }
@@ -94,32 +93,17 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
         if (!CHANNEL.equals(channel)) {
             return;
         }
+        String version = HandshakeProtocol.readSupportedVersion(message);
+        if (version == null) {
+            // Invalid or outdated messages must not cancel the join deadline.
+            return;
+        }
         BukkitTask task = pending.remove(player.getUniqueId());
         if (task != null) {
             task.cancel();
-        }
-        if (logChecks) {
-            getLogger().info(player.getName() + " verified — AegisAC " + readVersion(message) + ".");
-        }
-    }
-
-    private static String readVersion(byte[] data) {
-        try {
-            int len = 0;
-            int shift = 0;
-            int i = 0;
-            byte b;
-            do {
-                b = data[i++];
-                len |= (b & 0x7F) << shift;
-                shift += 7;
-            } while ((b & 0x80) != 0);
-            if (len <= 0 || i + len > data.length) {
-                return "unknown version";
+            if (logChecks) {
+                getLogger().info(player.getName() + " verified — Client Anticheat v" + version + ".");
             }
-            return "v" + new String(data, i, len, StandardCharsets.UTF_8);
-        } catch (RuntimeException e) {
-            return "unknown version";
         }
     }
 
@@ -128,7 +112,7 @@ public final class ForceAegisAC extends JavaPlugin implements Listener, PluginMe
                              @NotNull String label, String @NotNull [] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             loadSettings();
-            sender.sendMessage(Component.text("ForceAegisAC config reloaded."));
+            sender.sendMessage(Component.text("Force Client Anticheat config reloaded."));
             return true;
         }
         sender.sendMessage(Component.text("Usage: /" + label + " reload"));

@@ -40,8 +40,6 @@ public class SessionRecorder {
 
     private boolean recording = false;
     private long startEpochMs = 0;
-    private final List<SessionData.JEvent> jumps = new ArrayList<>();
-    private final List<SessionData.CEvent> combos = new ArrayList<>();
     private final List<SessionData.SEvent> swings = new ArrayList<>();
     private final List<SessionData.ShieldSwapEvent> shieldSwapEvents = new ArrayList<>();
     private final List<String> opponents = new ArrayList<>();
@@ -102,20 +100,6 @@ public class SessionRecorder {
         }
         finalizeSession(true);
         recording = false;
-    }
-
-    public void recordJump(long deltaMs, String result) {
-        if (recording) {
-            jumps.add(new SessionData.JEvent(System.currentTimeMillis(), deltaMs, result));
-            trim(jumps);
-        }
-    }
-
-    public void recordCombo(long intervalMs, boolean newCombo) {
-        if (recording) {
-            combos.add(new SessionData.CEvent(System.currentTimeMillis(), intervalMs, newCombo));
-            trim(combos);
-        }
     }
 
     public void samplePing(int roundTripMs) {
@@ -232,8 +216,6 @@ public class SessionRecorder {
 
     private void resetSessionState() {
         startEpochMs = System.currentTimeMillis();
-        jumps.clear();
-        combos.clear();
         swings.clear();
         shieldSwapEvents.clear();
         opponents.clear();
@@ -325,7 +307,11 @@ public class SessionRecorder {
                     continue;
                 }
                 String version = meta.getVersion() == null ? "" : meta.getVersion().getFriendlyString();
-                out.add(new SessionData.ModEntry(meta.getName(), version));
+                List<String> authors = meta.getAuthors().stream()
+                        .map(author -> author.getName())
+                        .filter(name -> name != null && !name.isBlank())
+                        .toList();
+                out.add(new SessionData.ModEntry(meta.getName(), version, authors));
             }
             out.sort(java.util.Comparator.comparing(
                     (SessionData.ModEntry m) -> m.name == null ? "" : m.name.toLowerCase(java.util.Locale.ROOT)));
@@ -339,8 +325,10 @@ public class SessionRecorder {
         LocalPlayer p = Minecraft.getInstance().player;
 
         SessionData d = new SessionData();
-        d.mod = "AegisAC";
-        d.mcVersion = "1.21.11";
+        d.mod = "Client Anticheat";
+        d.mcVersion = FabricLoader.getInstance().getModContainer("minecraft")
+                .map(container -> container.getMetadata().getVersion().getFriendlyString())
+                .orElse("unknown");
         d.mods = collectMods();
         d.player = firstNonNull(playerName, p != null ? p.getName().getString() : null, "unknown");
         d.playerUuid = firstNonNull(playerUuid, p != null ? p.getUUID().toString() : null, "unknown");
@@ -348,8 +336,6 @@ public class SessionRecorder {
         d.endEpochMs = endEpochMs;
         d.startUtc = HUMAN.format(Instant.ofEpochMilli(startEpochMs));
         d.endUtc = HUMAN.format(Instant.ofEpochMilli(endEpochMs));
-        d.jumpEvents = new ArrayList<>(jumps);
-        d.comboEvents = new ArrayList<>(combos);
         d.swingEvents = new ArrayList<>(swings);
         d.shieldSwapEvents = new ArrayList<>(shieldSwapEvents);
         d.hits = hits;

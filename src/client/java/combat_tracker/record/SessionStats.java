@@ -5,56 +5,8 @@ final class SessionStats {
     }
 
     static void summarise(SessionData d) {
-        summariseJumps(d);
-        summariseCombos(d);
         summariseSwings(d);
         summariseShieldBreaks(d);
-    }
-
-    private static void summariseJumps(SessionData d) {
-        int hits = 0;
-        double sum = 0, sumSq = 0;
-        double hSum = 0, hSumSq = 0;
-        long hMin = Long.MAX_VALUE, hMax = Long.MIN_VALUE;
-        for (SessionData.JEvent j : d.jumpEvents) {
-            sum += j.deltaMs;
-            sumSq += (double) j.deltaMs * j.deltaMs;
-            if ("SUCCESS".equals(j.result)) {
-                hits++;
-                hSum += j.deltaMs;
-                hSumSq += (double) j.deltaMs * j.deltaMs;
-                hMin = Math.min(hMin, j.deltaMs);
-                hMax = Math.max(hMax, j.deltaMs);
-            }
-        }
-        int n = d.jumpEvents.size();
-        d.jumpAttempts = n;
-        d.jumpHits = hits;
-        d.jumpMisses = n - hits;
-        d.jumpAvgMs = n == 0 ? 0 : sum / n;
-        d.jumpSdMs = stdDev(sum, sumSq, n);
-
-        d.hitAvgMs = hits == 0 ? 0 : hSum / hits;
-        d.hitSdMs = stdDev(hSum, hSumSq, hits);
-        d.hitMinMs = hits == 0 ? 0 : hMin;
-        d.hitMaxMs = hits == 0 ? 0 : hMax;
-    }
-
-    private static void summariseCombos(SessionData d) {
-        double sum = 0, sumSq = 0;
-        int comboCount = 0;
-        for (SessionData.CEvent c : d.comboEvents) {
-            sum += c.intervalMs;
-            sumSq += (double) c.intervalMs * c.intervalMs;
-            if (c.newCombo) {
-                comboCount++;
-            }
-        }
-        int n = d.comboEvents.size();
-        d.comboIntervals = n;
-        d.combos = comboCount;
-        d.comboAvgMs = n == 0 ? 0 : sum / n;
-        d.comboJitterMs = stdDev(sum, sumSq, n);
     }
 
     private static void summariseSwings(SessionData d) {

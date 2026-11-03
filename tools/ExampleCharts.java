@@ -16,7 +16,6 @@ public class ExampleCharts {
     static final Color MUTED   = new Color(0x8a93a0);
     static final Color HIT     = new Color(0x4caf50);
     static final Color MISS    = new Color(0xef5350);
-    static final Color COMBO   = new Color(0x29b6f6);
     static final Color WARN    = new Color(0xffb454);
 
     static final int W = 1280, H = 470;
@@ -27,60 +26,9 @@ public class ExampleCharts {
         File dir = new File(args.length > 0 ? args[0] : ".");
         dir.mkdirs();
 
-        jumpReset(new File(dir, "example-jump-reset.png"));
-        combo(new File(dir, "example-combo.png"));
         reach(new File(dir, "example-reach.png"));
         aim(new File(dir, "example-aim.png"));
         System.out.println("done");
-    }
-
-    static void jumpReset(File out) throws Exception {
-        render(out, "Jump reset timing",
-                "Milliseconds between taking the hit and jumping. Spread is what a person looks like.",
-                "Human", "Timing wanders. SD 24 ms",
-                "Macro", "Same value every time. SD 2 ms",
-                (g, side) -> {
-                    Random r = new Random(side == 0 ? 7 : 9);
-                    int px = side == 0 ? PX1 : PX2;
-                    axes(g, px, "ms", 0, 100, new String[]{"0", "25", "50", "75", "100"});
-                    for (int i = 0; i < 90; i++) {
-                        double v = side == 0
-                                ? 46 + r.nextGaussian() * 24
-                                : 41 + r.nextGaussian() * 2;
-                        v = Math.max(0, Math.min(100, v));
-                        double x = px + 46 + (PW - 62) * (i / 89.0);
-                        double y = PY + PH - 34 - (v / 100.0) * (PH - 56);
-                        dot(g, x, y, v >= 0 && v <= 80 ? HIT : MISS, 3.6);
-                    }
-                });
-    }
-
-    static void combo(File out) throws Exception {
-        render(out, "Combo timing",
-                "Gap between consecutive hits in a combo. Measured from your mouse press, not the tick.",
-                "Human", "Clicks jitter. SD 54 ms",
-                "Autoclicker", "Machine steady. SD 3 ms",
-                (g, side) -> {
-                    Random r = new Random(side == 0 ? 3 : 11);
-                    int px = side == 0 ? PX1 : PX2;
-                    axes(g, px, "ms", 450, 850, new String[]{"450", "550", "650", "750", "850"});
-                    double prevX = -1, prevY = -1;
-                    for (int i = 0; i < 70; i++) {
-                        double v = side == 0
-                                ? 645 + r.nextGaussian() * 54
-                                : 627 + r.nextGaussian() * 3;
-                        v = Math.max(450, Math.min(850, v));
-                        double x = px + 46 + (PW - 62) * (i / 69.0);
-                        double y = PY + PH - 34 - ((v - 450) / 400.0) * (PH - 56);
-                        if (prevX >= 0) {
-                            g.setColor(new Color(COMBO.getRed(), COMBO.getGreen(), COMBO.getBlue(), 90));
-                            g.setStroke(new BasicStroke(1.2f));
-                            g.draw(new Line2D.Double(prevX, prevY, x, y));
-                        }
-                        dot(g, x, y, COMBO, 3.6);
-                        prevX = x; prevY = y;
-                    }
-                });
     }
 
     static void reach(File out) throws Exception {

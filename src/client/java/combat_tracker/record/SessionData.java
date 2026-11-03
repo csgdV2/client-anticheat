@@ -15,17 +15,6 @@ public final class SessionData {
     public String startUtc;
     public String endUtc;
 
-    public int jumpAttempts;
-    public int jumpHits;
-    public int jumpMisses;
-    public double jumpAvgMs;
-    public double jumpSdMs;
-
-    public int comboIntervals;
-    public int combos;
-    public double comboAvgMs;
-    public double comboJitterMs;
-
     public int swings;
     public int swingHits;
     public int swingMisses;
@@ -50,11 +39,6 @@ public final class SessionData {
 
     public String accountType;
 
-    public double hitAvgMs;
-    public double hitSdMs;
-    public long hitMinMs;
-    public long hitMaxMs;
-
     public transient int flagHotbar;
     public transient int flagUse;
     public transient int flagAttack;
@@ -62,8 +46,6 @@ public final class SessionData {
 
     public List<String> opponents = new ArrayList<>();
 
-    public List<JEvent> jumpEvents = new ArrayList<>();
-    public List<CEvent> comboEvents = new ArrayList<>();
     public List<SEvent> swingEvents = new ArrayList<>();
     public transient List<FEvent> flagEvents = new ArrayList<>();
 
@@ -98,28 +80,15 @@ public final class SessionData {
     public static final class ModEntry {
         public String name;
         public String version;
+        public List<String> authors = new ArrayList<>();
 
         public ModEntry() {
         }
 
-        public ModEntry(String name, String version) {
+        public ModEntry(String name, String version, List<String> authors) {
             this.name = name;
             this.version = version;
-        }
-    }
-
-    public static final class JEvent {
-        public long t;
-        public long deltaMs;
-        public String result;
-
-        public JEvent() {
-        }
-
-        public JEvent(long t, long deltaMs, String result) {
-            this.t = t;
-            this.deltaMs = deltaMs;
-            this.result = result;
+            this.authors = authors == null ? new ArrayList<>() : new ArrayList<>(authors);
         }
     }
 
@@ -133,21 +102,6 @@ public final class SessionData {
         public ShieldSwapEvent(long t, long deltaMs) {
             this.t = t;
             this.deltaMs = deltaMs;
-        }
-    }
-
-    public static final class CEvent {
-        public long t;
-        public long intervalMs;
-        public boolean newCombo;
-
-        public CEvent() {
-        }
-
-        public CEvent(long t, long intervalMs, boolean newCombo) {
-            this.t = t;
-            this.intervalMs = intervalMs;
-            this.newCombo = newCombo;
         }
     }
 

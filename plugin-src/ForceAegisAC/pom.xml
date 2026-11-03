@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.aegisac</groupId>
-    <artifactId>force-aegisac</artifactId>
-    <version>1.0.0</version>
+    <artifactId>force-client-anticheat</artifactId>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
-    <name>ForceAegisAC</name>
-    <description>Requires the AegisAC client mod to join the server.</description>
+    <name>Force Client Anticheat</name>
+    <description>Requires the Client Anticheat client mod to join the server.</description>
 
     <properties>
         <java.version>21</java.version>
@@ -25,6 +25,12 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
         <!--
           Built against the earliest 1.21 API on purpose. The plugin only uses APIs that
           have existed since 1.21.1 (plugin channels, join/quit events, the scheduler,
@@ -40,7 +46,7 @@
     </dependencies>
 
     <build>
-        <finalName>${project.name}-${project.version}</finalName>
+        <finalName>ForceClientAnticheat-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

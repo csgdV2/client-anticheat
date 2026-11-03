@@ -4,6 +4,25 @@ on: [pull_request, push]
 jobs:
   build:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - minecraft: '1.21.1'
+            variant: '1.21.1'
+            fabric-api: '0.116.17+1.21.1'
+          - minecraft: '1.21.4'
+            variant: '1.21.4'
+            fabric-api: '0.119.4+1.21.4'
+          - minecraft: '1.21.8'
+            variant: '1.21.8'
+            fabric-api: '0.136.1+1.21.8'
+          - minecraft: '1.21.11'
+            variant: ''
+            fabric-api: '0.141.4+1.21.11'
+          - minecraft: '26.2'
+            variant: '26.2'
+            fabric-api: '0.161.0+26.2'
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
@@ -17,9 +36,18 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
       - name: build
-        run: ./gradlew build
+        env:
+          SOURCE_VARIANT: ${{ matrix.variant }}
+          MINECRAFT_VERSION: ${{ matrix.minecraft }}
+          FABRIC_API_VERSION: ${{ matrix.fabric-api }}
+        run: |
+          args=(build "-Pminecraft_version=$MINECRAFT_VERSION" "-Pfabric_api_version=$FABRIC_API_VERSION")
+          if [ -n "$SOURCE_VARIANT" ]; then
+            args+=("-PsourceVariant=$SOURCE_VARIANT")
+          fi
+          ./gradlew "${args[@]}"
       - name: capture build artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: Artifacts
+          name: ClientAnticheat-${{ matrix.minecraft }}
           path: build/libs/

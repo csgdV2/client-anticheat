@@ -1,6 +1,5 @@
 package combat_tracker.mixin;
 
-import combat_tracker.detection.ComboTracker;
 import combat_tracker.detection.IntegrityMonitor;
 import combat_tracker.detection.OpponentTracker;
 import combat_tracker.record.SessionRecorder;
@@ -17,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MultiPlayerGameModeMixin {
 
     @Inject(method = "attack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
-    private void jumpResetTracker$onAttack(Player player, Entity target, CallbackInfo ci) {
+    private void clientAnticheat$onAttack(Player player, Entity target, CallbackInfo ci) {
         IntegrityMonitor.get().checkSlotNow();
         IntegrityMonitor.get().onAttack();
         if (target instanceof Player hit) {
@@ -30,6 +29,5 @@ public class MultiPlayerGameModeMixin {
         boolean sweep = charge > 0.9F && !sprint && player.onGround()
                 && player.getMainHandItem().is(ItemTags.SWORDS);
         SessionRecorder.get().recordLandedHit(critical, sprint, sweep, weak);
-        ComboTracker.get().onAttack(target);
     }
 }
